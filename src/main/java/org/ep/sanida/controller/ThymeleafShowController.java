@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ThymeleafShowController {
         @RequestMapping("/")
     public String loginPage(){
-        return "auth-login";
+        return "index";
     }
 
     @RequestMapping("/home")
     public String loginSubmit(){
-        return "/pages/landing_page";
+        return "/pages/home";
     }
 }
