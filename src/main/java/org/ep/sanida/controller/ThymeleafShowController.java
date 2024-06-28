@@ -11,7 +11,21 @@ public class ThymeleafShowController {
     }
 
     @RequestMapping("/home")
-    public String loginSubmit(){
+    public String homeSubmit(){
         return "/pages/home";
     }
+    @RequestMapping("/home2")
+    public String home2Submit(){
+        return "/page2";
+    }
+    @RequestMapping("/home3")
+    public String home3Submit(){
+        return "/page3";
+    }
+
+    @RequestMapping("/home4")
+    public String home4Submit(){
+        return "/page4";
+    }
+
 }
