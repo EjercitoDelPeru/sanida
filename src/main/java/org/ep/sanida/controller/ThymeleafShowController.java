@@ -28,4 +28,25 @@ public class ThymeleafShowController {
         return "/page4";
     }
 
+    @RequestMapping("/home5")
+    public String home5Submit(){
+        return "/page5";
+    }
+
+    @RequestMapping("/home6")
+    public String home6Submit(){
+        return "/page6";
+    }
+
+    
+    @RequestMapping("/home7")
+    public String home7Submit(){
+        return "/page7";
+    }
+
+    @RequestMapping("/home8")
+    public String home8Submit(){
+        return "/page8";
+    }
+
 }
