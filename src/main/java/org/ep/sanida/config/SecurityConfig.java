@@ -74,7 +74,7 @@ public class SecurityConfig {
                 );
 
         //httpSecurity.userDetailsService(userDetailServiceImpl);
-        httpSecurity.userDetailsService(userDetailsService(passwordEncoder()));
+       // httpSecurity.userDetailsService(userDetailsService(passwordEncoder()));
        // httpSecurity.userDetailsService(userDetailServiceImpl);//calling of userDetails Strategy to be used
 
         return httpSecurity.build();
@@ -96,8 +96,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // return new BCryptPasswordEncoder();
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
+        //return NoOpPasswordEncoder.getInstance();
 
     }
 
