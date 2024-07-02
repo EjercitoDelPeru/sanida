@@ -91,6 +91,9 @@
                 display: block;
             }
         }
+        .expand-icon {
+            float: right;
+        }
     </style>
 </head>
 <body>
@@ -104,7 +107,7 @@
                         <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-speedometer2"></i> Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-people"></i> Users</a>
+                        <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-people"></i> Users <i class="bi bi-chevron-right expand-icon"></i></a>
                         <ul class="nav flex-column submenu">
                             <li class="nav-item">
                                 <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person-badge"></i> All Users</a>
@@ -115,7 +118,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-gear"></i> Settings</a>
+                        <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-gear"></i> Settings <i class="bi bi-chevron-right expand-icon"></i></a>
                         <ul class="nav flex-column submenu">
                             <li class="nav-item">
                                 <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person"></i> Profile</a>
@@ -138,58 +141,55 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('sidebar-open');
+            const sidebar = $('.sidebar');
+            const content = $('.content');
+            if ($(window).width() <= 768) {
+                sidebar.toggleClass('sidebar-open');
             } else {
-                sidebar.classList.toggle('sidebar-closed');
-                content.classList.toggle('content-expanded');
+                sidebar.toggleClass('sidebar-closed');
+                content.toggleClass('content-expanded');
             }
         }
 
         function setActive(element) {
-            const navLinks = document.querySelectorAll('.sidebar .nav-link');
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-            });
+            $('.sidebar .nav-link').removeClass('active');
+            $(element).addClass('active');
 
-            const navItems = document.querySelectorAll('.sidebar .nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (!item.contains(element)) {
-                    item.classList.remove('expanded');
-                }
-            });
-
-            element.classList.add('active');
-            const parentItem = element.closest('.nav-item');
-            if (parentItem) {
-                parentItem.classList.add('active');
-                parentItem.classList.add('expanded');
+            const parentItem = $(element).closest('.nav-item');
+            if (parentItem.length > 0) {
+                parentItem.addClass('active').addClass('expanded').find('.expand-icon').removeClass('bi-chevron-right').addClass('bi-chevron-down');
             }
+
+            $('.sidebar .nav-item').not(parentItem).removeClass('expanded').find('.expand-icon').removeClass('bi-chevron-down').addClass('bi-chevron-right');
         }
 
         function toggleSubmenu(element) {
-            const parentItem = element.closest('.nav-item');
-            const isExpanded = parentItem.classList.contains('expanded');
+            const parentItem = $(element).closest('.nav-item');
+            const isExpanded = parentItem.hasClass('expanded');
 
-            // Expand/Collapse the submenu
-            parentItem.classList.toggle('expanded', !isExpanded);
+            parentItem.toggleClass('expanded', !isExpanded);
+
+            const expandIcon = $(element).find('.expand-icon');
+            if (!isExpanded) {
+                expandIcon.removeClass('bi-chevron-right').addClass('bi-chevron-down');
+            } else {
+                expandIcon.removeClass('bi-chevron-down').addClass('bi-chevron-right');
+            }
         }
 
-        document.addEventListener('click', function(event) {
-            const sidebar = document.querySelector('.sidebar');
-            const menuToggle = document.querySelector('.menuToggle');
-            const closeButton = document.querySelector('.close-btn');
-            const isClickInsideSidebar = sidebar.contains(event.target);
-            const isClickOnMenuToggle = menuToggle.contains(event.target);
-            const isClickOnCloseButton = closeButton.contains(event.target);
-            const isSidebarOpen = sidebar.classList.contains('sidebar-open');
-            if (!isClickInsideSidebar && !isClickOnMenuToggle && !isClickOnCloseButton && isSidebarOpen && window.innerWidth <= 768) {
-                sidebar.classList.remove('sidebar-open');
+        $(document).on('click', function(event) {
+            const sidebar = $('.sidebar');
+            const menuToggle = $('.menuToggle');
+            const closeButton = $('.close-btn');
+            const isClickInsideSidebar = sidebar.is(event.target) || sidebar.has(event.target).length !== 0;
+            const isClickOnMenuToggle = menuToggle.is(event.target) || menuToggle.has(event.target).length !== 0;
+            const isClickOnCloseButton = closeButton.is(event.target) || closeButton.has(event.target).length !== 0;
+            const isSidebarOpen = sidebar.hasClass('sidebar-open');
+            if (!isClickInsideSidebar && !isClickOnMenuToggle && !isClickOnCloseButton && isSidebarOpen && $(window).width() <= 768) {
+                sidebar.removeClass('sidebar-open');
             }
         });
     </script>

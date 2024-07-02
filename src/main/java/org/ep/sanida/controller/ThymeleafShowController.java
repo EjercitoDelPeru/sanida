@@ -1,6 +1,15 @@
 package org.ep.sanida.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -48,5 +57,21 @@ public class ThymeleafShowController {
     public String home8Submit(){
         return "/page8";
     }
+    private static final Logger logger = LoggerFactory.getLogger(ThymeleafShowController.class);
+
+      @GetMapping("/mensaje")
+  public ResponseEntity<?> getMensaje() {
+    logger.info("Obteniendo el mensaje");
+ 
+    var auth =  SecurityContextHolder.getContext().getAuthentication();
+    logger.info("Datos del Usuario: {}", auth.getPrincipal());
+    logger.info("Username del Usuario: {}", auth.getName() );
+    logger.info("Datos de los Roles {}", auth.getAuthorities());
+    logger.info("Esta autenticado {}", auth.isAuthenticated());
+
+    Map<String, String> mensaje = new HashMap<>();
+    mensaje.put("contenido", "Hola Peru");
+    return ResponseEntity.ok(mensaje);
+  }
 
 }
