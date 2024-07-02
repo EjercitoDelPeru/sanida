@@ -1,0 +1,149 @@
+package com.ep.sanidad.controller;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/auth2")
+//@PreAuthorize("denyAll()")
+public class TestAuthController {
+
+
+    @GetMapping("/hello")
+    @PreAuthorize("permitAll()")
+    //@PreAuthorize("anyRequest()")
+    public String hello(){
+        return "hello";
+    }
+    @GetMapping("/hello-secured")
+    @PreAuthorize("hasAuthority('CREATE')")
+    public String helloSecured(){
+        return "hello secured";
+    }
+}
+
+
+
+package com.ep.sanidad.config;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    // Configuring HttpSecurity 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 
+        return http.csrf().disable() 
+                .authorizeHttpRequests() 
+                .requestMatchers("/auth/welcome").permitAll() 
+                .and() 
+                .authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated() 
+                .and() 
+                .authorizeHttpRequests().requestMatchers("/auth/admin/**").authenticated() 
+                .and().formLogin() 
+                .and().build(); 
+    } 
+
+    // @Bean
+    // SecurityFilterChain web(HttpSecurity https) throws Exception {
+    // https
+    // // .authorizeHttpRequests((authorize) -> authorize
+    // // .anyRequest().authenticated());
+    // .csrf(csrf -> csrf.disable())
+    // .httpBasic(Customizer.withDefaults())
+    // .sessionManagement(session ->
+    // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    // .authorizeHttpRequests(http -> {
+    // // Configurar los endpoints publicos
+    // http.requestMatchers(HttpMethod.GET, "/auth/hello").permitAll();
+    // http.requestMatchers(HttpMethod.GET,
+    // "/auth/hello-secured").hasAuthority("CREATE");
+    // // Cofnigurar los endpoints privados
+    // //http.requestMatchers(HttpMethod.POST, "/auth/post").hasAnyRole("ADMIN",
+    // "DEVELOPER");
+    // //http.requestMatchers(HttpMethod.PATCH,
+    // "/auth/patch").hasAnyAuthority("REFACTOR");
+
+    // // Configurar el resto de endpoint - NO ESPECIFICADOS
+    // http.anyRequest().denyAll();
+    // });
+    // return https.build();
+    // }
+
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    //     return httpSecurity
+    //             .csrf(csrf -> csrf.disable())
+    //             .httpBasic(Customizer.withDefaults())
+    //             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    //             .build();
+    // }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(userDetailsService(passwordEncoder()));
+        return provider;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+         return new BCryptPasswordEncoder();
+        //return NoOpPasswordEncoder.getInstance();
+
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+        List<UserDetails> userDetailsList = new ArrayList<>();
+        userDetailsList.add(User.withUsername("admin")
+                .password(encoder.encode("123")) 
+                .roles("ADMIN", "USER") 
+                //.authorities("hello","hello-secured")
+                .authorities("READ", "CREATE")
+                .build());
+        userDetailsList.add(User.withUsername("user")
+        .password(encoder.encode("123")) 
+                .roles("USER")
+                //.authorities("hello")
+                .authorities("USER")
+                .build());
+
+        return new InMemoryUserDetailsManager(userDetailsList);
+    }
+
+}

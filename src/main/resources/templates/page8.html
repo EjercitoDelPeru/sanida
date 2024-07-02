@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            overflow: hidden;
+            height: 100vh;
+        }
+        .wrapper {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            transition: transform 0.3s ease, width 0.3s ease;
+            height: 100%;
+            flex-shrink: 0;
+            position: relative;
+            overflow-y: auto;
+        }
+        .sidebar .nav-link {
+            color: white;
+        }
+        .sidebar .nav-link.active {
+            background-color: #495057;
+        }
+        .sidebar .nav-item.active > .nav-link {
+            background-color: #495057;
+        }
+        .sidebar .nav-item.expanded {
+            background-color: #3e444a;
+        }
+        .sidebar .submenu {
+            padding-left: 20px;
+            display: none;
+        }
+        .sidebar .nav-item.expanded .submenu {
+            display: block;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            overflow-y: auto;
+        }
+        .menuToggle {
+            margin-bottom: 20px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .sidebar-closed {
+            transform: translateX(-250px);
+            width: 0;
+        }
+        .content-expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: absolute;
+                z-index: 1000;
+                width: 250px;
+            }
+            .sidebar-open {
+                transform: translateX(0);
+            }
+            .content {
+                width: 100%;
+                margin-left: 0;
+            }
+            .close-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="sidebar bg-dark">
+            <button class="close-btn" onclick="toggleSidebar()">×</button>
+            <div class="p-3">
+                <h4>Admin Dashboard</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-people"></i> Users</a>
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person-badge"></i> All Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person-plus"></i> Add User</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-gear"></i> Settings</a>
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person"></i> Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-shield-lock"></i> Account</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="content flex-grow-1">
+            <button class="btn btn-primary menuToggle" onclick="toggleSidebar()">☰</button>
+            <h1>Welcome to the Admin Dashboard</h1>
+            <p>This is the main content area.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('sidebar-open');
+            } else {
+                sidebar.classList.toggle('sidebar-closed');
+                content.classList.toggle('content-expanded');
+            }
+        }
+
+        function setActive(element) {
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const navItems = document.querySelectorAll('.sidebar .nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (!item.contains(element)) {
+                    item.classList.remove('expanded');
+                }
+            });
+
+            element.classList.add('active');
+            const parentItem = element.closest('.nav-item');
+            if (parentItem) {
+                parentItem.classList.add('active');
+                parentItem.classList.add('expanded');
+            }
+        }
+
+        function toggleSubmenu(element) {
+            const parentItem = element.closest('.nav-item');
+            const isExpanded = parentItem.classList.contains('expanded');
+
+            // Expand/Collapse the submenu
+            parentItem.classList.toggle('expanded', !isExpanded);
+        }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menuToggle');
+            const closeButton = document.querySelector('.close-btn');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnMenuToggle = menuToggle.contains(event.target);
+            const isClickOnCloseButton = closeButton.contains(event.target);
+            const isSidebarOpen = sidebar.classList.contains('sidebar-open');
+            if (!isClickInsideSidebar && !isClickOnMenuToggle && !isClickOnCloseButton && isSidebarOpen && window.innerWidth <= 768) {
+                sidebar.classList.remove('sidebar-open');
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
