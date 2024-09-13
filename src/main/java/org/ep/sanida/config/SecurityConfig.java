@@ -42,18 +42,28 @@ public class SecurityConfig {
         // please use requestMatchers(MvcRequestMatcher);
         httpSecurity
 
-                .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/webjars/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/user/**")).hasRole("USER")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN")
+                .authorizeHttpRequests((http) -> {
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/webjars/**")).permitAll();
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll();
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/user/**")).hasRole("USER");
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN");
                         // if you use authority to manage a context, use: hasAuthority("ADMIN")
 
 
 
                         //Do it in the template view and at the side side which is my case.
-                        .anyRequest().authenticated()
-                )
+
+                        // Configurar los endpoints publicos
+                    http.requestMatchers(HttpMethod.GET, "/auth/get").permitAll();
+
+                    // Cofnigurar los endpoints privados
+                    http.requestMatchers(HttpMethod.POST, "/auth/post").hasAnyRole("ADMIN", "DEVELOPER");
+                    http.requestMatchers(HttpMethod.PATCH, "/auth/patch").hasAnyAuthority("REFACTOR");
+
+                    // Configurar el resto de endpoint - NO ESPECIFICADOS
+                    http.anyRequest().denyAll();
+                    //    http.anyRequest().authenticated();
+    })
                    .formLogin(withDefaults());//default form spring used
              /*   .formLogin(form -> form
                         .loginPage("/login")
@@ -76,7 +86,7 @@ public class SecurityConfig {
                 );
 
         //httpSecurity.userDetailsService(userDetailServiceImpl);
-        httpSecurity.userDetailsService(userDetailsService(passwordEncoder()));
+       // httpSecurity.userDetailsService(userDetailsService(passwordEncoder()));
        // httpSecurity.userDetailsService(userDetailServiceImpl);//calling of userDetails Strategy to be used
 
         return httpSecurity.build();
@@ -103,6 +113,7 @@ public class SecurityConfig {
 
     }
 
+    // Luego esto será reemplazado por public class UserDetailServiceImpl implements UserDetailsService 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         List<UserDetails> userDetailsList = new ArrayList<>();
