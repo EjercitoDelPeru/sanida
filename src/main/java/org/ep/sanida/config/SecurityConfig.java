@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -27,8 +28,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -49,6 +48,9 @@ public class SecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/user/**")).hasRole("USER")
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN")
                         // if you use authority to manage a context, use: hasAuthority("ADMIN")
+
+
+
                         //Do it in the template view and at the side side which is my case.
                         .anyRequest().authenticated()
                 )
@@ -96,8 +98,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // return new BCryptPasswordEncoder();
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
+        //return NoOpPasswordEncoder.getInstance();
 
     }
 
@@ -121,6 +123,49 @@ public class SecurityConfig {
     }
 
 
+/*
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
+        //If this endpoint is a Spring MVC endpoint,
+        // please use requestMatchers(MvcRequestMatcher);
+        httpSecurity
+
+                .authorizeHttpRequests((http) -> {
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/webjars/**")).permitAll();
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll();
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/user/**")).hasRole("USER");
+                        http.requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN");
+                        // if you use authority to manage a context, use: hasAuthority("ADMIN")
+                        //Do it in the template view and at the side side which is my case.
+
+                        // Configurar los endpoints publicos
+                    http.requestMatchers(HttpMethod.GET, "/auth/get").permitAll();
+
+                    // Cofnigurar los endpoints privados
+                    http.requestMatchers(HttpMethod.POST, "/auth/post").hasAnyRole("ADMIN", "DEVELOPER");
+                    http.requestMatchers(HttpMethod.PATCH, "/auth/patch").hasAnyAuthority("REFACTOR");
+
+                    // Configurar el resto de endpoint - NO ESPECIFICADOS
+                    //http.anyRequest().denyAll();
+                        http.anyRequest().authenticated();
+    })
+                   .formLogin(withDefaults());//default form spring used
+
+        httpSecurity.rememberMe(withDefaults());
+
+
+
+        httpSecurity
+                // sample exception handling customization
+                .exceptionHandling((exceptionHandling) ->
+                        exceptionHandling
+                                .accessDeniedPage("/access-denied")
+                );
+
+
+        return httpSecurity.build();
+    }
+         */
 
 }

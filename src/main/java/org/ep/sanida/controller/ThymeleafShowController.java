@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ThymeleafShowController {
         @RequestMapping("/")
-    public String loginPage(){
+    public String index(){
         return "index";
+    }
+    @GetMapping("/admin/dashboard")
+    public String adminDashboard() {
+        return "admin/dashboard";
     }
 
     @RequestMapping("/home")

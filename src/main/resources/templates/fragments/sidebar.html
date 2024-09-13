@@ -6,60 +6,42 @@
 </head>
 <body>
 <div id="sidebar" class='active' th:fragment="sidebar"><!--sidebar-->
-    <div class="sidebar-wrapper active">
-        <div class="sidebar-header">
-            <img src="assets/images/logo.svg" alt="" srcset="">
-        </div>
-        <div class="sidebar-menu">
-            <ul class="menu">
-
-
-                <li class='sidebar-title'>Main Menu</li>
-
-
-
-                <li class="sidebar-item active ">
-                    <a href="index.html" class='sidebar-link'>
-                        <i data-feather="home" width="20"></i>
-                        <span>Dashboard</span>
-                    </a>
-
+    <nav class="sidebar bg-dark">
+        <button class="close-btn" onclick="toggleSidebar()">×</button>
+        <div class="p-3">
+            <h4>Admin Dashboard</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-speedometer2"></i> Dashboard</a>
                 </li>
-
-
-
-                <li class='sidebar-title'>Forms &amp; Tables</li>
-
-
-
-                <li class="sidebar-item  ">
-                    <a href="table.html" class='sidebar-link'>
-                        <i data-feather="grid" width="20"></i>
-                        <span>Table</span>
-                    </a>
-
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-people"></i> Users <i class="bi bi-chevron-right expand-icon"></i></a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person-badge"></i> All Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person-plus"></i> Add User</a>
+                        </li>
+                    </ul>
                 </li>
-
-
-
-
-                <li class="sidebar-item  ">
-                    <a href="table-datatable.html" class='sidebar-link'>
-                        <i data-feather="file-plus" width="20"></i>
-                        <span>Datatable</span>
-                    </a>
-
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(this)"><i class="bi bi-gear"></i> Settings <i class="bi bi-chevron-right expand-icon"></i></a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-person"></i> Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-shield-lock"></i> Account</a>
+                        </li>
+                    </ul>
                 </li>
-
-
-
-
-
-
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="setActive(this)"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                </li>
             </ul>
         </div>
-        <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
-    </div>
+    </nav>
 </div>
 </body>
 </html>

@@ -1,40 +1,185 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+        <style>
+            body {
+                overflow: hidden;
+                height: 100vh;
+            }
+            .wrapper {
+                display: flex;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+            .sidebar {
+                width: 250px;
+                background-color: #343a40;
+                color: white;
+                transition: transform 0.3s ease, width 0.3s ease;
+                height: 100%;
+                flex-shrink: 0;
+                position: relative;
+                overflow-y: auto;
+            }
+            .sidebar .nav-link {
+                color: white;
+            }
+            .sidebar .nav-link.active {
+                background-color: #495057;
+            }
+            .sidebar .nav-item.active > .nav-link {
+                background-color: #495057;
+            }
+            .sidebar .nav-item.expanded {
+                background-color: #3e444a;
+            }
+            .sidebar .submenu {
+                padding-left: 20px;
+                display: none;
+            }
+            .sidebar .nav-item.expanded .submenu {
+                display: block;
+            }
+            .content {
+                flex-grow: 1;
+                padding: 20px;
+                transition: margin-left 0.3s ease;
+                overflow-y: auto;
+            }
+            .menuToggle {
+                margin-bottom: 20px;
+            }
+            .close-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                display: none;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+            }
+            .sidebar-closed {
+                transform: translateX(-250px);
+                width: 0;
+            }
+            .content-expanded {
+                margin-left: 0;
+                width: 100%;
+            }
+            @media (max-width: 768px) {
+                .sidebar {
+                    transform: translateX(-100%);
+                    position: absolute;
+                    z-index: 1000;
+                    width: 250px;
+                }
+                .sidebar-open {
+                    transform: translateX(0);
+                }
+                .content {
+                    width: 100%;
+                    margin-left: 0;
+                }
+                .close-btn {
+                    display: block;
+                }
+            }
+            .expand-icon {
+                float: right;
+            }
+        </style>
+    </head>
+    <body>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Voler Admin Dashboard</title>
 
-    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
 
-    <link rel="stylesheet" th:href="@{/css/Chart.min.css}">
 
-    <link rel="stylesheet" th:href="@{/css/perfect-scrollbar.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-    <link rel="shortcut icon" th:href="@{/images/favicon.svg}" type="image/x-icon">
-</head>
-
-<body>
-<div id="app"><!--Main content-->
+<div class="wrapper"><!--Main content-->
     <span th:replace="fragments/sidebar :: sidebar"></span>
     <div id="main"><!--Content id-->
         <span th:replace="fragments/header :: header"></span>
-        <div class="main-content container-fluid" layout:fragment="content"><!--dynamic content-->
+        <div class="content flex-grow-1" layout:fragment="content"><!--dynamic content-->
             <!--you can replace this using page-->
         </div>
                 <span th:replace="fragments/footer :: footer"></span>
     </div>
 </div>
-<script th:src="@{/js/feather.min.js}"></script>
-<script th:src="@{/js/perfect-scrollbar.min.js}"></script>
-<script th:src="@{/js/app.js}"></script>
 
-<script th:src="@{/js/Chart.min.js}"></script>
-<script th:src="@{/js/apexcharts.min.js}"></script>
-<script th:src="@{/js/dashboard.js}"></script>
 
-<script th:src="@{/js/main.js}"></script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const content = document.querySelector('.content');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('sidebar-open');
+        } else {
+            sidebar.classList.toggle('sidebar-closed');
+            content.classList.toggle('content-expanded');
+        }
+    }
+
+    function setActive(element) {
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const navItems = document.querySelectorAll('.sidebar .nav-item');
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (!item.contains(element)) {
+                item.classList.remove('expanded');
+            }
+        });
+
+        element.classList.add('active');
+        const parentItem = element.closest('.nav-item');
+        if (parentItem) {
+            parentItem.classList.add('active');
+            parentItem.classList.add('expanded');
+        }
+    }
+
+    function toggleSubmenu(element) {
+        const parentItem = element.closest('.nav-item');
+        const isExpanded = parentItem.classList.contains('expanded');
+
+        // Expand/Collapse the submenu
+        parentItem.classList.toggle('expanded', !isExpanded);
+
+        // Toggle the icon
+        const expandIcon = element.querySelector('.expand-icon');
+        if (isExpanded) {
+            expandIcon.classList.remove('bi-chevron-down');
+            expandIcon.classList.add('bi-chevron-right');
+        } else {
+            expandIcon.classList.remove('bi-chevron-right');
+            expandIcon.classList.add('bi-chevron-down');
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const sidebar = document.querySelector('.sidebar');
+        const menuToggle = document.querySelector('.menuToggle');
+        const closeButton = document.querySelector('.close-btn');
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuToggle = menuToggle.contains(event.target);
+        const isClickOnCloseButton = closeButton.contains(event.target);
+        const isSidebarOpen = sidebar.classList.contains('sidebar-open');
+        if (!isClickInsideSidebar && !isClickOnMenuToggle && !isClickOnCloseButton && isSidebarOpen && window.innerWidth <= 768) {
+            sidebar.classList.remove('sidebar-open');
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
