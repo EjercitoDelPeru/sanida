@@ -61,8 +61,8 @@ public class SecurityConfig {
                     http.requestMatchers(HttpMethod.PATCH, "/auth/patch").hasAnyAuthority("REFACTOR");
 
                     // Configurar el resto de endpoint - NO ESPECIFICADOS
-                    http.anyRequest().denyAll();
-                    //    http.anyRequest().authenticated();
+                    //http.anyRequest().denyAll();
+                        http.anyRequest().authenticated();
     })
                    .formLogin(withDefaults());//default form spring used
              /*   .formLogin(form -> form
